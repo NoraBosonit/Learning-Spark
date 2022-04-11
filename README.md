@@ -102,7 +102,36 @@ Es la parte de la Spark application responsable de instanciar un *SparkSession*.
 - Transformar todas las operaciones de Spark en cálculos DAG y los distribuye su ejecución como tareas a los executors.
 
 #### SparkSession
+Es un conducto unificado para las operaciones y datos de Spark que ha hecho más fácil trabajar con Spark.
+A través del SparkSesion
 
+#### Cluster Manager
+El cluster manager es el responsable de administrar y asignar recursos para los nodos del cluster en los que se ejecuta su aplicación Spark. Actuamente Spark admite 4 clusters managers:
+- El administrador de clusters independiente integrado
+- Apache Hadoop YARNApache Mesos
+- Kubernetes
 
+#### Spark executor
+Se ejecuta en cada nodo worker del cluster y se comunica con el driver program. Además, son los encargados de ejecutar tareas sobre los workers. Se suele ejecutar solo un executor por nodo.
 
+#### Modos de implementación
+Spark es compatible con innumerables modos de implementación lo que permite que se pueda ejecutar en diferentes congiguraciones y entornos. Se puede configurar en Apache Hadoop YARN y Kubernetes.
+
+#### Distributed data and partitions
+Los datos se dividen en particiones y se reparten por todo el cluster para crear un paralelismo a la hora de ejecutar las tareas.
+Ejemplo
+Este código divide los datos físicos almacenados en los clusters en 8 particiones.
+```
+# In Python
+log_df = spark.read.text("path_to_large_text_file").repartition(8)
+print(log_df.rdd.getNumPartitions())
+```
+Aquí se creará un DataFrame de 10.000 enteros distribuidos en 8 particiones de memoria. 
+```
+# In Python
+df = spark.range(0, 10000, 1, 8)
+print(df.rdd.getNumPartitions())
+```
+
+## Chapter 2:
 
