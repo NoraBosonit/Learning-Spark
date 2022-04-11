@@ -133,5 +133,53 @@ df = spark.range(0, 10000, 1, 8)
 print(df.rdd.getNumPartitions())
 ```
 
-## Chapter 2:
+## Chapter 2: Downloading and Getting Started
+El modo local para grandes conjuntos de datos no es adecuado. Mejor YARN o Kubernetes. 
 
+### Step 1: Downloading Apache Spark
+*README.md* 
+contiene instrucciones de cómo utilizar las shells de Spark, compilar Spark desde el origen, ejecutar ejemplos de Spark...
+
+#### Directorios y archivos de Spark
+*bin* 
+Contiene la mayoría de los scripts para interactuar con Spark incluyendo Spark shells (spark-sql, pyspark, spark-shell y sparkR)
+
+*sbin*
+Los scripts de este directorio tienen un propósito más administrativo, para inciar y detener los compomentes de Spark en el cluster.
+
+*kubernetes*
+Contienen Dockerfiles para crear imágenes Docker
+
+*data*
+Este directorio está `pblacon con archivos .txt
+
+### Paso 2: Uso de Scala o PySpark shell
+Ejemplo en el que se lee un archivo de texto como un DataFrame, se muestra una muestra de cadenas vacías y se cuenta el número total de lineas en el archivo.
+show(10, flase) muestra las 10 primeras lineas sin truncar (false por defecto true)
+
+```
+With Python
+>>> strings = spark.read.text("../README.md")
+>>> strings.show(10, truncate=False)
++------------------------------------------------------------------------------+
+|value |
++------------------------------------------------------------------------------+
+|# Apache Spark |
+| |
+|Spark is a unified analytics engine for large-scale data processing. It |
+|provides high-level APIs in Scala, Java, Python, and R, and an optimized |
+|engine that supports general computation graphs for data analysis. It also |
+|supports a rich set of higher-level tools including Spark SQL for SQL and |
+|DataFrames, MLlib for machine learning, GraphX for graph processing, |
+|and Structured Streaming for stream processing. |
+| |
+|<https://spark.apache.org/> |
++------------------------------------------------------------------------------+
+only showing top 10 rows
+>>> strings.count()
+109
+>>>
+```
+
+### Paso 3: Comprender los conceptos de la aplicación Spark
+Algunos términos importantes
