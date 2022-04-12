@@ -232,3 +232,24 @@ Una única unidad de trabajo o ejecución que se enviará a un Spark executor
 En el nucleo de cada Application Spark se encuantra el driver program que crea un objeto del tipo SparkSession. Cuando se trabaja con la shell de spark, la SparkSession se crea directamente sin necesidad de hacer nada.
 
 #### Spark Jobs
+Durante las sesiones con las Spark shells, el driver convierte la Spark application en uno o más jobs. Luego transforma cada job en un DAG. Este es el plan de ejecución de Spark donde cada nodo dentro de un DAG podría ser una o varias etapas de Spark.
+
+#### Spark Stages
+Las Stages se crean en función de qué operaciones se pueden realizar en serie o en paralelo. No todas las operaciones pueden ocurrir en una sola etapa (stage), por lo que se dividen en varias. 
+
+#### Spark Tasks
+Cada stage se compone de tareas de Spark que se llevan a cabo en cada executor de Spark. Cada tarea se asigna a un solo nucleo y funciona en una sola particion de datos. 
+
+### Transformaciones, acciones y evaluación perezosa
+Las transformaciones transforman un Data Frame en otro sin alterar los datos originales, dando como resultado la inmutabilidad de los dataframes y, por tanto, la tolerancia a fallos. Las transformaciones se evalúan perezosamente, es decir, los resultados no se conmutan inmediatamente sino que se espera a qua se ejecute una acción para ññevar a cabo las transformaciones. 
+
+Ejemplo
+```
+# In Python 
+>>> strings = spark.read.text("../README.md") 
+>>> filtered = strings.filter(strings.value.contains("Spark")) 
+>>> filtered.count() 
+20 
+```
+
+#### Transformaciones estrechas y anchas
