@@ -5,6 +5,7 @@ Además, MP era ineficiente para procesos iterativos. Surge Apache Spark
 
 ### Qué es?
 Apache Spark es un motor unificado diseñado para el procesamiento de datos distribuidos a gran escala en las insalaciones de los centros de datos o en la nube
+
 Se centra en 4 características:
 - Velocidad
 - Facilidad de uso
@@ -14,6 +15,7 @@ Se centra en 4 características:
 ### Análisis Unificado
 #### Spark SQL
 Funciona bien con datos estucturados y puede leer datos almacenados en tablas RDBMS o desde archivos estructurasos como CSV, text, JSON... y construir tablas permanentes o temporales en Spark. 
+
 Ejemplo de lectura desde JSON
 ```
 // In Scala
@@ -30,6 +32,7 @@ val results = spark.sql("""SELECT name, org, module, release, num_commits
 Es una bibliotecta que contiene algoritmos para el Aprendizaje Automático. Se divide en 2 partes:
 - spark.mllib: basada en DataFrame
 - spark.ml: basada en RDD
+
 Ejemplo
 ```
 # In Python
@@ -49,6 +52,7 @@ lrModel.transform(test)
 
 #### Transmisión estructurada de Spark
 Necesario para que los desarrolladores puedan trabajar tanto con datos estáticos como con datos de transmisión de motores
+
 Ejemplo
 ```
 # In Python
@@ -74,6 +78,7 @@ query = (word_counts
 
 #### GraphX
 Es una biblioeca para manipular grafos
+
 Ejemplo
 ```
 // In Scala
@@ -93,7 +98,7 @@ graph = x.Graph(vertices, edges)
 
 ### Ejecución distribuida de Apache Spark
 Los componentes de Apache Spark funcionan en colaboración dentro de un grupo de máquinas para obtener un procesamiento distribuido de los datos. Esto sucede de la siguiente forma:
-La Spark Application, que es un driver program que es responsable de orquestar operaciones paralelas en el cluster Spark, accede a los componentes distribuidos del clsuter. El Driver accede a los componentes distribuidos del cluster (los Spark executors y el cluster manager) através de un *SparkSession*.
+La Spark Application, el cual es un driver program que es responsable de orquestar operaciones paralelas en el cluster Spark, accede a los componentes distribuidos del clsuter. El Driver accede a los componentes distribuidos del cluster (los Spark executors y el cluster manager) através de un *SparkSession*.
 
 #### Spark Driver
 Es la parte de la Spark application responsable de instanciar un *SparkSession*. El Spark Sriver tiene diversas funciones como:
@@ -102,8 +107,15 @@ Es la parte de la Spark application responsable de instanciar un *SparkSession*.
 - Transformar todas las operaciones de Spark en cálculos DAG y los distribuye su ejecución como tareas a los executors.
 
 #### SparkSession
-Es un conducto unificado para las operaciones y datos de Spark que ha hecho más fácil trabajar con Spark.
-A través del SparkSesion
+Es un conducto unificado para las operaciones y datos de Spark que ha hecho más fácil trabajar con Spark. Es el punto de entrada a Spark SQL y se necesita para hacer operaciones en Spark, es lo primero que se crea. Una vez se ha creado la SparkSession, se pueden definir data frames, emitir consultas SQL...
+
+En la spark-shell la SparkSession se crea automáticamente y puedes acceder a ella mediante una variable llamada *spark* o *sc*. 
+
+Ejemplo
+
+```
+
+```
 
 #### Cluster Manager
 El cluster manager es el responsable de administrar y asignar recursos para los nodos del cluster en los que se ejecuta su aplicación Spark. Actuamente Spark admite 4 clusters managers:
