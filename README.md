@@ -114,24 +114,41 @@ En la spark-shell la SparkSession se crea automáticamente y puedes acceder a el
 Ejemplo
 
 ```
+// In Scala
+import org.apache.spark.sql.SparkSession
+// Build SparkSession
+val spark = SparkSession
+ .builder
+ .appName("LearnSpark")
+ .config("spark.sql.shuffle.partitions", 6)
+ .getOrCreate()
+...
+// Use the session to read JSON
+val people = spark.read.json("...")
+...
+// Use the session to issue a SQL query
+val resultsDF = spark.sql("SELECT city, pop, state, zip FROM table_name")
 
 ```
 
 #### Cluster Manager
 El cluster manager es el responsable de administrar y asignar recursos para los nodos del cluster en los que se ejecuta su aplicación Spark. Actuamente Spark admite 4 clusters managers:
 - El administrador de clusters independiente integrado
-- Apache Hadoop YARNApache Mesos
+- Apache Hadoop YARN
+- Apache Mesos
 - Kubernetes
 
 #### Spark executor
-Se ejecuta en cada nodo worker del cluster y se comunica con el driver program. Además, son los encargados de ejecutar tareas sobre los workers. Se suele ejecutar solo un executor por nodo.
+Se ejecuta en cada nodo worker del cluster y se comunica con el Driver program. Además, son los encargados de ejecutar tareas sobre los workers. Se suele ejecutar solo un executor por nodo.
 
 #### Modos de implementación
 Spark es compatible con innumerables modos de implementación lo que permite que se pueda ejecutar en diferentes congiguraciones y entornos. Se puede configurar en Apache Hadoop YARN y Kubernetes.
 
 #### Distributed data and partitions
 Los datos se dividen en particiones y se reparten por todo el cluster para crear un paralelismo a la hora de ejecutar las tareas.
+
 Ejemplo
+
 Este código divide los datos físicos almacenados en los clusters en 8 particiones.
 ```
 # In Python
@@ -149,10 +166,10 @@ print(df.rdd.getNumPartitions())
 El modo local para grandes conjuntos de datos no es adecuado. Mejor YARN o Kubernetes. 
 
 ### Step 1: Downloading Apache Spark
-*README.md* 
-contiene instrucciones de cómo utilizar las shells de Spark, compilar Spark desde el origen, ejecutar ejemplos de Spark...
-
 #### Directorios y archivos de Spark
+*README.md* 
+Contiene instrucciones de cómo utilizar las shells de Spark, compilar Spark desde el origen, ejecutar ejemplos de Spark...
+
 *bin* 
 Contiene la mayoría de los scripts para interactuar con Spark incluyendo Spark shells (spark-sql, pyspark, spark-shell y sparkR)
 
@@ -163,7 +180,7 @@ Los scripts de este directorio tienen un propósito más administrativo, para in
 Contienen Dockerfiles para crear imágenes Docker
 
 *data*
-Este directorio está `pblacon con archivos .txt
+Este directorio está poblacon con archivos *.txt*
 
 ### Paso 2: Uso de Scala o PySpark shell
 Ejemplo en el que se lee un archivo de texto como un DataFrame, se muestra una muestra de cadenas vacías y se cuenta el número total de lineas en el archivo.
@@ -194,4 +211,24 @@ only showing top 10 rows
 ```
 
 ### Paso 3: Comprender los conceptos de la aplicación Spark
-Algunos términos importantes
+Algunos términos importantes:
+
+*Application*
+Es un programa de usuario creado en Spark utilizando sus API. Es un proograma controlador y ejecutor del cluster.
+
+*SparkSession*
+Es un objeto que proporciona un punto de entrada para programar con las API de Spark.
+
+*Job*
+Es un cómputo paralelo que consta de varias tareas que se generan en respuesta a una acción de Spark.
+
+*Stage*
+Cada job se divide en conjuntos más pequeños de tasks llamadas stages que dependes unas de las otras.
+
+*Task*
+Una única unidad de trabajo o ejecución que se enviará a un Spark executor
+
+#### Aplicación Spark y SparkSession
+En el nucleo de cada Application Spark se encuantra el driver program que crea un objeto del tipo SparkSession. Cuando se trabaja con la shell de spark, la SparkSession se crea directamente sin necesidad de hacer nada.
+
+#### Spark Jobs
