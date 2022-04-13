@@ -243,6 +243,16 @@ Cada stage se compone de tareas de Spark que se llevan a cabo en cada executor d
 ### Transformaciones, acciones y evaluación perezosa
 Las transformaciones transforman un Data Frame en otro sin alterar los datos originales, dando como resultado la inmutabilidad de los dataframes y, por tanto, la tolerancia a fallos. Las transformaciones se evalúan perezosamente, es decir, los resultados no se conmutan inmediatamente sino que se espera a qua se ejecute una acción para ññevar a cabo las transformaciones. 
 
+Ejemplos de acciones y transformaciones
+
+| Transformaciones| Acciones|
+| ----- | ---- |
+|orderBy()|show()|
+|groupBy()|take()|
+|filter()|count()|
+|select()|collect()|
+|join()|save()|
+
 Ejemplo
 ```
 # In Python 
@@ -252,4 +262,29 @@ Ejemplo
 20 
 ```
 
+En este caso hay 2 transfromaciones; read() y filter(), y una acción; count(). No se desencadena la ejecución hasta que count() no se ejecuta en el shell.
+
 #### Transformaciones estrechas y anchas
+El que Spark siga un esquema perezoso es que puede inspeccionar su consulta y determinar cómo llevarla a cabo de forma óptima; uniendo operaciones y asignándolas a una sola etapa o mezclado de datos y división entre clusters. 
+
+Las transformaciones se pueden dividir en:
+
+- dependencias estrechas
+- dependencias anchas
+
+Las dependencias estrechas son aquellas con las que se puede calcular una sola partición de salida a partir de una sola partición de entrada sin intercambio de datos entre particiones. Por ejemplo, filter() y contains().
+
+Las dependecias anchas leen datos, los transforman y hacen la lectura en el disco. Un ejemplo es groupBy() que tiene que modificar la tabla original para mostrar el resultado. Se necesita una combinación entre particiones. 
+
+
+### Interfaz de usuario de Spark
+- Se ejecuta en el puerto 4040
+En imágenes del libro se ve con más detalle
+
+(falta poner imágemes job, stage, task e interfaz)
+
+
+## Chapter 3
+
+
+ 
