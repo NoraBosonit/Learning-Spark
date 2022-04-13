@@ -284,7 +284,85 @@ En imágenes del libro se ve con más detalle
 (falta poner imágemes job, stage, task e interfaz)
 
 
-## Chapter 3
+## Chapter 3: Apache Spark’s Structured APIs
+### Spark: ¿Qué hay debajo de un RDD?
+El RDD es la abstracción más básica de Spark el cual tiene asociado 3 características:
 
+- Dependecias 
+- Particiones (con información de lo localización)
+- Compute function (Partition => Iterador[T] #Creo que es en Scala
+
+La lista de dependencias indica a Spark cómo se construye un RDD co sus entradas. Cuando sea necesario para reproducir resultados, Spark puede recrear un RDD a partir de esas dependecias y replicar operaciones. Esta característica le da resiliencia a los RDD.
+Las particiones le dan a Spark la capacidad de dividir el trabajo para paralelizar el cálculo entre los executers.
+La función de cálculo produce un iterador apra los datos que serán almacenados en el RDD.
+
+Sin embargo, hay una abstracción que produce un desconocimiento de Spark de todo lo que está haciendo en la función de cómputo. Además de que el iterador también es opaco, lo ve como un objeto genérico de Python.  
+
+Por todo esto surge Spark 2.x, un Spark estructurado.
+
+### Structuring Spark
+Spark 2.x introdujo algunos esquemas clave para estructurar Spark utilizando patrones para expresar los cálculos. Estos patrones se expresan con operaciones como contar, seleccionar, filtrar, agregar, promediar, agregar... Todo esto permite decirle a Spark qué es lo que se quiere hacer y como resultado un plan eficiente para su ejecución dando como resultado una estructura que le permite organizar los datos en formato de tabla SQL u hoja de cálculo.
+
+#### Méritos y beneficios clave
+Esta estructura produce unos beneficios como un mejor rendimiento y una eficiencia de espacio en todos los componentes de Spark. Las ventajas más importantes son:
+
+- Expresividad
+- Simplicidad
+- Compatibilidad
+- Uniformidad
+
+Las diferencias mecionadas se pueden ver aquí:
+
+Abstracción RDD
+
+```
+# In Python
+# Create an RDD of tuples (name, age)
+dataRDD = sc.parallelize([("Brooke", 20), ("Denny", 31), ("Jules", 30),
+ ("TD", 35), ("Brooke", 25)])
+# Use map and reduceByKey transformations with their lambda 
+# expressions to aggregate and then compute average
+agesRDD = (dataRDD
+ .map(lambda x: (x[0], (x[1], 1)))
+ .reduceByKey(lambda x, y: (x[0] + y[0], x[1] + y[1]))
+ .map(lambda x: (x[0], x[1][0]/x[1][1])))
+
+```
+
+Spark 2.x
+
+```
+# In Python 
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import avg
+# Create a DataFrame using SparkSession
+spark = (SparkSession
+ .builder
+ .appName("AuthorsAges")
+ .getOrCreate())
+# Create a DataFrame 
+data_df = spark.createDataFrame([("Brooke", 20), ("Denny", 31), ("Jules", 30),
+ ("TD", 35), ("Brooke", 25)], ["name", "age"])
+# Group the same names together, aggregate their ages, and compute an average
+avg_df = data_df.groupBy("name").agg(avg("age"))
+# Show the results of the final execution
+avg_df.show()
++------+--------+
+| name|avg(age)|
++------+--------+
+|Brooke| 22.5|
+| Jules| 30.0|
+| TD| 35.0|
+| Denny| 31.0|
++------+--------+
+
+```
+
+En ambos casos se está agregando las edades de cada nombre, se agrupan por nombre y se calcula la media de las edades. Sin embargo, mientras que en el primer caso es muy difícil de leer, en el segundo se puede ver un código más expresivo y simple. Esto es debido a que se está utilizando operadores DSL de alto nivel para decirle a Spark qué hacer. De esta forma puede optimizar su consulata y ejecutar las consulatas de forma eficiente. 
+
+
+### The DataFrame API
+Inspirado en el DataFrame de pandas en su estructura, formato y algunas peraciones específicas. 
+Cuando los datos se visualizan como una tabla estructurada no solo son más fáciles de 
 
  
