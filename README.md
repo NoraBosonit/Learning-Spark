@@ -398,7 +398,6 @@ Estos son los tipos de datos básicos de Python en Spark:
 
 
 
-
 #### Tipos de datos complejos y estructurados de Spark
 Para los análisis de datos complejos nose trabajará con datos simples o básicos sino datos complejos, normalmente estructurados o anidados. 
 
@@ -710,4 +709,26 @@ import pyspark.sql.functions as F
 Ejercicios en el Notebook
 
 ### El conjunto de datos de la API
+Spark unificó los DataFrames y los dataset de las API como APIs estructuradas con interfaces similares para que los desarrolladores solo tengan que aprender un único conjunto de APIs. Los DataSets tienen dos características:
 
+- typed APIs 
+- untyped APIs
+
+#### Typed Objects, Untyped Objects and Generic Rows
+En los lenguajes soportados por Spark, los Datasets solo tienen sentido en Java y Scala mientras que en Python y R solo son los DataFrames. 
+
+|Language | Typed and untyped main abstraction | Typed or untyped |
+| ------ | -------- | --------|
+|Scala | Dataset[T] and DataFrame (alias for Dataset[Row]) | Both typed and untyped|
+|Java |Dataset<T>| Typed|
+|Python| DataFrame |Generic Row untyped|
+|R| DataFrame |Generic Row untyped|
+ 
+ Las filas son objetos genéricos a los que se acceden mediante índices. 
+ 
+ ```
+ from pyspark.sql import Row
+row = Row(350, True, "Learning Spark 2E", None)
+row[0]
+row[1]
+ ```
