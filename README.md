@@ -168,18 +168,23 @@ El modo local para grandes conjuntos de datos no es adecuado. Mejor YARN o Kuber
 ### Step 1: Downloading Apache Spark
 #### Directorios y archivos de Spark
 *README.md* 
+
 Contiene instrucciones de cómo utilizar las shells de Spark, compilar Spark desde el origen, ejecutar ejemplos de Spark...
 
 *bin* 
+
 Contiene la mayoría de los scripts para interactuar con Spark incluyendo Spark shells (spark-sql, pyspark, spark-shell y sparkR)
 
 *sbin*
+
 Los scripts de este directorio tienen un propósito más administrativo, para inciar y detener los compomentes de Spark en el cluster.
 
 *kubernetes*
+
 Contienen Dockerfiles para crear imágenes Docker
 
 *data*
+
 Este directorio está poblacon con archivos *.txt*
 
 ### Paso 2: Uso de Scala o PySpark shell
@@ -214,18 +219,23 @@ only showing top 10 rows
 Algunos términos importantes:
 
 *Application*
+
 Es un programa de usuario creado en Spark utilizando sus API. Es un proograma controlador y ejecutor del cluster.
 
 *SparkSession*
+
 Es un objeto que proporciona un punto de entrada para programar con las API de Spark.
 
 *Job*
+
 Es un cómputo paralelo que consta de varias tareas que se generan en respuesta a una acción de Spark.
 
 *Stage*
+
 Cada job se divide en conjuntos más pequeños de tasks llamadas stages que dependes unas de las otras.
 
 *Task*
+
 Una única unidad de trabajo o ejecución que se enviará a un Spark executor
 
 #### Aplicación Spark y SparkSession
@@ -801,13 +811,17 @@ Se pasará por todos los pasos mencionados hasta llegar a la visualización para
 **Fases de la optimización de consultas**
 
 ***Fase 1:Análisis***
+
 Se genera un árbol de sintaxis abstacta para la consulta SQL o DataFrame. Se observa el tipo de datos de las columnas, los nombres, las funciones utilizadas, tablas, bases de datos...
 
 ***Fase 2: Optimización lógica***
+
 Contruirá planes y les asignará costes. 
 
 ***Fase 3: Planificación física***
+
 Se genera un plan físico para llevar a cabo los planes lógicos.
 
 ***Fase 4: Generación de código***
+
 Se genera el códifo para ejecutar el plan físico. El Project Tungsten tiene aquí un papel ya qie facilita la generación de código. 
