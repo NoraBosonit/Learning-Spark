@@ -709,22 +709,23 @@ import pyspark.sql.functions as F
 Ejercicios en el Notebook
 
 ### The Dataset API
-Spark unificó los DataFrames y los dataset de las API como APIs estructuradas con interfaces similares para que los desarrolladores solo tengan que aprender un único conjunto de APIs. Los DataSets tienen dos características:
+Spark unificó los DataFrames y los dataset de las API como APIs estructuradas con interfaces similares para que los desarrolladores solo tengan que aprender un único conjunto de APIs. Los Datasets tienen dos características:
 
 - typed APIs 
 - untyped APIs
 
+
 #### Typed Objects, Untyped Objects and Generic Rows
 En los lenguajes soportados por Spark, los Datasets solo tienen sentido en Java y Scala mientras que en Python y R solo son los DataFrames. 
+ 
+Las filas son objetos genéricos de tipos mixtos a los que se acceden mediante índices. 
 
 |Language | Typed and untyped main abstraction | Typed or untyped |
 | ------ | -------- | --------|
 |Scala | Dataset[T] and DataFrame (alias for Dataset[Row]) | Both typed and untyped|
-|Java |Dataset<T>| Typed|
-|Python| DataFrame |Generic Row untyped|
-|R| DataFrame |Generic Row untyped|
- 
- Las filas son objetos genéricos a los que se acceden mediante índices. 
+|Java |Dataset'<'T'>' | Typed|
+|Python| DataFrame | Generic Row untyped|
+|R | DataFrame | Generic Row untyped|
  
  ```
  from pyspark.sql import Row
@@ -732,3 +733,81 @@ row = Row(350, True, "Learning Spark 2E", None)
 row[0]
 row[1]
  ```
+Código en Jupyter Notebook
+
+#### DataFrames vs Datasets
+En muchos casos cualquiera de los dos funcionará de la misma forma, pero hay situaciones que es preferible uno respecto al otro.
+- Si se quiere decir a Spark qué hacer y no cómo hacer podremos usar cualquiera de los dos
+- Si se quiere na semántica risa, abstacciones de alto nivel y operaciones DSL, también son adecuados los dos
+- Si se necesita un tiempo estricto de compilación y no importa crear diversas clases de de un mismo Dataset[T], mejor Datasets
+- Si se están procesando expresiones de alto nivel, filtros, maps, aggregaciones, consultas SQL... Cualquiera de los dos basta.
+- Si se hacen transformaciones relacionales similares a SQL, DataFrames
+- Tungsten --'>' Datasets
+- Si se desea unificar, optimizar el código y simplificar las API, DataFrames
+- Para R, DataFrames
+- Para Python, DataFrames y RDD si se necesita más control
+- Si se desea eficiencia de espacio y velocidad, DataFrames
+- Si se desea detectar errores durante la compilación en lugar de durante el tiempo de ejecución, se escoje la API adecuada según la siguiente imagen:
+![Structured API](https://user-images.githubusercontent.com/102373797/164425518-8f76a6b2-028a-49d3-9d14-9534e8baba04.png)
+
+
+
+##### Cuándo usar RDD
+RDD no está del todo sustituido por las APIs de alto nivel. En las siguientes situaciones sería adecuado el uso de RDDs:
+1. Se están utilizando paquetes de terceros escritos en RDD
+2. Se puede renunciar a la optimización del código, la utilización eficiente del espacio y los beneficios de rendimiento disponibles con DataFrames y Datasets
+3. Se quiere decir con exactitud a Spark cómo hacer una consulta
+
+El proceso de crear consultas eficientes y generar código es el trabajo del motor Spark SQL. 
+
+#### Spark SQL y el motor subyacente
+Este motor permite a los desarrolladores realizar consultas similares a las de SQL en sus datos.
+El motor SQL:
+- Unifica los componentes y permita la abstacción de Datastes/DataFrames en Java, Scala, Python y R
+- Se conecta a las tablas y almacén de Apache Hive
+- Lee y escribe datos estructurados con un esquema específico
+- Ofrece una spark-shell SQL interactivo
+
+El motor SQL utiliza Catalyst Optimizer para SQL y Tungsten para la generación de código compacto.
+##### The Catalyst Optimizer
+Toma una consulta y la convierte en un plan de ejecución pasando por cuatro fases de transformación:
+1. Análisis
+2. Optimización lógica
+3. Planificación física
+4. Generación de código
+
+Estos pasos se siguen siempre independientemente del lenguaje que se utilice. Por ejemplo tanto para:
+
+Python
+```
+count_mnm_df = (mnm_df
+ .select("State", "Color", "Count")
+ .groupBy("State", "Color")
+ .agg(count("Count")
+ .alias("Total"))
+ .orderBy("Total", ascending=False))
+```
+
+como SQL
+```
+SELECT State, Color, Count, sum(Count) AS Total
+FROM MNM_TABLE_NAME
+GROUP BY State, Color, Count
+ORDER BY Total DESC
+```
+
+Se pasará por todos los pasos mencionados hasta llegar a la visualización para el usuario
+
+**Fases de la optimización de consultas**
+
+***Fase 1:Análisis***
+Se genera un árbol de sintaxis abstacta para la consulta SQL o DataFrame. Se observa el tipo de datos de las columnas, los nombres, las funciones utilizadas, tablas, bases de datos...
+
+***Fase 2: Optimización lógica***
+Contruirá planes y les asignará costes. 
+
+***Fase 3: Planificación física***
+Se genera un plan físico para llevar a cabo los planes lógicos.
+
+***Fase 4: Generación de código***
+Se genera el códifo para ejecutar el plan físico. El Project Tungsten tiene aquí un papel ya qie facilita la generación de código. 
