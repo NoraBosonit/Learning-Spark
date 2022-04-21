@@ -708,7 +708,7 @@ import pyspark.sql.functions as F
 #### End-to-End DataFrame Example
 Ejercicios en el Notebook
 
-### The API Dataset
+### The Dataset API
 Spark unificó los DataFrames y los dataset de las API como APIs estructuradas con interfaces similares para que los desarrolladores solo tengan que aprender un único conjunto de APIs. Los DataSets tienen dos características:
 
 - typed APIs 
