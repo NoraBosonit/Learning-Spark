@@ -8,15 +8,30 @@ Apache Spark es un motor unificado diseñado para el procesamiento de datos dist
 
 Se centra en 4 características:
 - Velocidad
+
+Construye sus consultas como un grafo acíclico (DAG), puede paralelizar las tareas y su motor de ejecución física (Tungsten) utiliza código de etapa completa para la generación de código compacto.
+
 - Facilidad de uso
+
+Utiliza la estructura de datos lógicos llamada Comjunto de datos distribuido residente (RDD) sobre la que se construyen las abstacciones de alto nivel como Dataset o DataFrame.
+
 - Modularidad
+
+Ofrece APIs en Scala, Java, Python y R. Con Spark se puede hacer todo, no hacen falta otros motores.
+
 - Extensibilidad
 
+Centra su motor en el cómputo y no en el almacenamiento. 
+
 ### Análisis Unificado
+Como se menciona en la definición, Spark es un motor unificado. Esto se debe a que ofrece cuatro componentes distintos como bibliotecas para distintas cargas de trabajo: Spark SQL, SPark MLlib, Spark Structured Streaming y GraphX.
+
 #### Spark SQL
 Funciona bien con datos estucturados y puede leer datos almacenados en tablas RDBMS o desde archivos estructurasos como CSV, text, JSON... y construir tablas permanentes o temporales en Spark. 
 
-Ejemplo de lectura desde JSON
+Ejemplo de lectura desde JSON: puede leer desde un archivo JSON almacenado en 
+Amazon S3, crear una tabla temporal y emitir una consulta similar a SQL sobre los resultados leídos en 
+la memoria como Spark DataFrame
 ```
 // In Scala
 // Read data off Amazon S3 bucket into a Spark DataFrame
@@ -77,7 +92,7 @@ query = (word_counts
 ```
 
 #### GraphX
-Es una biblioeca para manipular grafos
+Es una biblioeca para manipular grafos y realizar cálculos de grafos en paralelo. 
 
 Ejemplo
 ```
@@ -98,7 +113,8 @@ graph = x.Graph(vertices, edges)
 
 ### Ejecución distribuida de Apache Spark
 Los componentes de Apache Spark funcionan en colaboración dentro de un grupo de máquinas para obtener un procesamiento distribuido de los datos. Esto sucede de la siguiente forma:
-La Spark Application, el cual es un driver program que es responsable de orquestar operaciones paralelas en el cluster Spark, accede a los componentes distribuidos del clsuter. El Driver accede a los componentes distribuidos del cluster (los Spark executors y el cluster manager) através de un *SparkSession*.
+La Spark Application, el cual es un driver program que es responsable de orquestar operaciones paralelas en el cluster Spark, accede a los componentes distribuidos del clsuter. El Driver accede a los componentes distribuidos del cluster (los Spark executors y el cluster manager) a través de un *SparkSession*.
+![Tema 1](https://user-images.githubusercontent.com/102373797/164645425-0b7fd033-630c-4c70-a1e3-613dd184999e.png)
 
 #### Spark Driver
 Es la parte de la Spark application responsable de instanciar un *SparkSession*. El Spark Sriver tiene diversas funciones como:
@@ -145,7 +161,7 @@ Se ejecuta en cada nodo worker del cluster y se comunica con el Driver program. 
 Spark es compatible con innumerables modos de implementación lo que permite que se pueda ejecutar en diferentes congiguraciones y entornos. Se puede configurar en Apache Hadoop YARN y Kubernetes.
 
 #### Distributed data and partitions
-Los datos se dividen en particiones y se reparten por todo el cluster para crear un paralelismo a la hora de ejecutar las tareas.
+Los datos se dividen en particiones y se reparten por todo el cluster para crear un paralelismo a la hora de ejecutar las tareas. De esta forma cada nodo accede a la partición más cercana y se dismunuye el ancho de banda de la red.
 
 Ejemplo
 
@@ -232,7 +248,7 @@ Es un cómputo paralelo que consta de varias tareas que se generan en respuesta 
 
 *Stage*
 
-Cada job se divide en conjuntos más pequeños de tasks llamadas stages que dependes unas de las otras.
+Cada job se divide en conjuntos más pequeños de tareas llamadas stages que dependes unas de las otras.
 
 *Task*
 
@@ -242,16 +258,20 @@ Una única unidad de trabajo o ejecución que se enviará a un Spark executor
 En el nucleo de cada Application Spark se encuantra el driver program que crea un objeto del tipo SparkSession. Cuando se trabaja con la shell de spark, la SparkSession se crea directamente sin necesidad de hacer nada.
 
 #### Spark Jobs
-Durante las sesiones con las Spark shells, el driver convierte la Spark application en uno o más jobs. Luego transforma cada job en un DAG. Este es el plan de ejecución de Spark donde cada nodo dentro de un DAG podría ser una o varias etapas de Spark.
+Durante las sesiones con las Spark shells, el driver convierte la Spark application en uno o más jobs. Luego transforma cada job en un DAG (grafo acíclico). Este es el plan de ejecución de Spark donde cada nodo dentro de un DAG podría ser una o varias etapas de Spark.
+![Jobs](https://user-images.githubusercontent.com/102373797/164645242-a8abeaf7-ee77-49c1-adb5-0aa4b2bab4d6.png)
 
 #### Spark Stages
 Las Stages se crean en función de qué operaciones se pueden realizar en serie o en paralelo. No todas las operaciones pueden ocurrir en una sola etapa (stage), por lo que se dividen en varias. 
+![Stage](https://user-images.githubusercontent.com/102373797/164645284-c5266498-6dee-430e-9f78-fd8d27351afa.png)
 
 #### Spark Tasks
 Cada stage se compone de tareas de Spark que se llevan a cabo en cada executor de Spark. Cada tarea se asigna a un solo nucleo y funciona en una sola particion de datos. 
+![Tasks](https://user-images.githubusercontent.com/102373797/164645304-e95b9fdb-80dd-49ab-b113-8282fa1ed29d.png)
 
 ### Transformaciones, acciones y evaluación perezosa
-Las transformaciones transforman un Data Frame en otro sin alterar los datos originales, dando como resultado la inmutabilidad de los dataframes y, por tanto, la tolerancia a fallos. Las transformaciones se evalúan perezosamente, es decir, los resultados no se conmutan inmediatamente sino que se espera a qua se ejecute una acción para ññevar a cabo las transformaciones. 
+Las operaciones de Spark se dividen en dos tipos: acciones y transformaciones. 
+Las transformaciones transforman un Data Frame en otro sin alterar los datos originales, dando como resultado la inmutabilidad de los dataframes y, por tanto, la tolerancia a fallos. Las transformaciones se evalúan perezosamente, es decir, los resultados no se conmutan inmediatamente sino que se espera a qua se ejecute una acción para ññevar a cabo las transformaciones. Mientras que las acciones desencadenan la ejecución de las tranformaciones registradas. Por ejemplo count(), show(), first().
 
 Ejemplos de acciones y transformaciones
 
@@ -285,13 +305,14 @@ Las transformaciones se pueden dividir en:
 Las dependencias estrechas son aquellas con las que se puede calcular una sola partición de salida a partir de una sola partición de entrada sin intercambio de datos entre particiones. Por ejemplo, filter() y contains().
 
 Las dependecias anchas leen datos, los transforman y hacen la lectura en el disco. Un ejemplo es groupBy() que tiene que modificar la tabla original para mostrar el resultado. Se necesita una combinación entre particiones. 
+![Dependencias](https://user-images.githubusercontent.com/102373797/164646391-f5831b83-73d5-4c33-9dc5-1164b7215b53.png)
 
 
 ### Interfaz de usuario de Spark
-- Se ejecuta en el puerto 4040
-En imágenes del libro se ve con más detalle
+Spark incluye una interfaz gráfica de usuario para inspeccionar o monitorear aplicaciones Spark (jobs, stages y tasks).
+El Driver inicia una interfaz de usuario web que se ejecuta en el puerto 4040.
 
-(falta poner imágemes job, stage, task e interfaz)
+En imágenes del libro se ve con más detalle
 
 
 ## Chapter 3: Apache Spark’s Structured APIs
@@ -367,7 +388,7 @@ avg_df.show()
 
 ```
 
-En ambos casos se está agregando las edades de cada nombre, se agrupan por nombre y se calcula la media de las edades. Sin embargo, mientras que en el primer caso es muy difícil de leer, en el segundo se puede ver un código más expresivo y simple. Esto es debido a que se está utilizando operadores DSL de alto nivel para decirle a Spark qué hacer. De esta forma puede optimizar su consulata y ejecutar las consulatas de forma eficiente. 
+En ambos casos se está agregando las edades de cada nombre, se agrupan por nombre y se calcula la media de las edades. Sin embargo, mientras que en el primer caso es muy difícil de leer, en el segundo se puede ver un código más expresivo y simple. Esto es debido a que se está utilizando operadores DSL de alto nivel para decirle a Spark qué hacer. De esta forma puede optimizar su consulata y ejecutar las consulatas de forma eficiente. **Toda esta simplicidad es gracias al motor Spark SQL**
 
 
 ### The DataFrame API
@@ -771,6 +792,7 @@ RDD no está del todo sustituido por las APIs de alto nivel. En las siguientes s
 El proceso de crear consultas eficientes y generar código es el trabajo del motor Spark SQL. 
 
 #### Spark SQL y el motor subyacente
+El proceso de crear consultas eficientes y generar código compacto es el trabajo del  motor Spark SQL y sobre el que se construyen las API estructuradas de alto nivel. 
 Este motor permite a los desarrolladores realizar consultas similares a las de SQL en sus datos.
 El motor SQL:
 - Unifica los componentes y permita la abstacción de Datastes/DataFrames en Java, Scala, Python y R
@@ -779,6 +801,7 @@ El motor SQL:
 - Ofrece una spark-shell SQL interactivo
 
 El motor SQL utiliza Catalyst Optimizer para SQL y Tungsten para la generación de código compacto.
+
 ##### The Catalyst Optimizer
 Toma una consulta y la convierte en un plan de ejecución pasando por cuatro fases de transformación:
 1. Análisis
@@ -828,4 +851,6 @@ Se genera el códifo para ejecutar el plan físico. El Project Tungsten tiene aq
 
 
 ## Chapter 4. Spark SQL and DataFrames: Introduction to Built-in Data Sources
+### Uso de Spark SQL en aplicaciones Spark
+
 
