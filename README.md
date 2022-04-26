@@ -852,5 +852,3 @@ Se genera el códifo para ejecutar el plan físico. El Project Tungsten tiene aq
 
 ## Chapter 4. Spark SQL and DataFrames: Introduction to Built-in Data Sources
 ### Uso de Spark SQL en aplicaciones Spark
-
-
