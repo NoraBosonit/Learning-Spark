@@ -852,3 +852,36 @@ Se genera el códifo para ejecutar el plan físico. El Project Tungsten tiene aq
 
 ## Chapter 4. Spark SQL and DataFrames: Introduction to Built-in Data Sources
 ### Uso de Spark SQL en aplicaciones Spark
+
+## Chapter 5. Spark SQL and DataFrames: Interacting with External Data Sources
+Veremos cómo Spark SQL (el motor de consultas) interactúa con componentes externos: utiliza funciones definidas por el usuario para Apache Hive y Apache Spark y se conecta con fuentes externas como MySQL, Tableau o MS SQL Server. 
+### Spark SQL and Apache Hive
+Spark SQL permite a los programadores de Spark aprovechar los beneficios de un rendimiento más rápido y una programación relacional (p. ej., consultas declarativas y almacenamiento optimizado), así como llamar a bibliotecas analíticas complejas (p. ej., aprendizaje automático).
+
+#### Funciones definidas por el usuario 
+Aunque Apache Spark tiene una cantidad de funciones integradas, su flexibilidad permite que los ingenieros de datos y los científicos de datos también definan sus propias funciones. Estas son las llamadas *funciones definidas por el usuario* (UDFs).
+
+##### Spark SQL UDFs
+El beneficio de poder crear funciones propias tanto en Pyspark como en Scala es que se pueden utilizar dentro de Spark SQL. Hay que tener en cuenta que las UDF funcionan por sesión y no se conservarán en el metastore subyacente.
+
+Ejemplo
+```
+// In Scala
+// Create cubed function
+val cubed = (s: Long) => {
+ s * s * s
+}
+// Register UDF
+spark.udf.register("cubed", cubed)
+// Create temporary view
+spark.range(1, 9).createOrReplaceTempView("udf_test")
+# In Python
+from pyspark.sql.types import LongType
+# Create cubed function
+def cubed(s):
+ return s * s * s
+# Register UDF
+spark.udf.register("cubed", cubed, LongType())
+# Generate temporary view
+spark.range(1, 9).createOrReplaceTempView("udf_test")
+```
