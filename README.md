@@ -885,3 +885,17 @@ spark.udf.register("cubed", cubed, LongType())
 # Generate temporary view
 spark.range(1, 9).createOrReplaceTempView("udf_test")
 ```
+
+##### Orden de evaluación y comprobación de nulos en Spark SQL
+Spark SQL no garantiza el orden de evaluación de las subexpresiones. Por ejemplo, aquí:
+
+```
+spark.sql("SELECT s FROM test1 WHERE s IS NOT NULL AND strlen(s) > 1")
+```
+
+No se garantiza que el NOT NULL se ejecute antes que que strlen().
+
+##### Sistribución de PySpark UDF con Pandas UDF
+Las UDF de PySpark eran más lentas que las de Scala ya que ñas primeras requerían un movimiento de datos entre JVM y Python lo cual era bastante costoso. Por ello, se introdujo Pandas UDFs en Spark 2.3. Para definir una UDF de pandas se utiliza la función ```pandas_udf```. 
+
+A 
