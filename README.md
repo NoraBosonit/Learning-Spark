@@ -1,3 +1,5 @@
+# README:
+A partir del capítulo 3, incluido, los ejercicios y apuntes se han hecho con Databricks
 # Learning-Spark
 ## Chapter 1: Introduction to Apache Spark
 Hadoop MP se quedó corto para tareas de ML o consultas de SQL por lo que surge el ecosistema Hadoop. 
